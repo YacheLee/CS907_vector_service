@@ -99,7 +99,7 @@ def visualise_vectors(terms, vectors):
     save_file_base64 = base64.b64encode(save_file.getvalue()).decode('utf8')
     return save_file_base64
 
-@app.route('/')
+@app.route('/api/base64')
 def get_vector_by_keyword():
     keyword = request.args.get("keyword")
     synonyms = get_synonyms_by_keyword(keyword)
