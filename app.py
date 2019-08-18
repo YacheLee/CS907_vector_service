@@ -25,9 +25,28 @@ def get_synonyms_by_keyword(keyword):
     url = "http://127.0.0.1:8079/api/synonym?keyword={}".format(quote(keyword))
     return http_request(url)
 
-def get_news_sentences(keyword):
+def get_tw_news(keyword):
     url = "http://127.0.0.1:8080/api/news?keyword={}".format(quote(keyword))
     return http_request(url)
+
+def get_hk_news(keyword):
+    url = "http://127.0.0.1:8078/api/news?keyword={}".format(quote(keyword))
+    return http_request(url)
+
+def get_cn_news(keyword):
+    url = "http://127.0.0.1:8077/api/news?keyword={}".format(quote(keyword))
+    return http_request(url)
+
+def get_news_sentences(keyword, is_tw, is_hk, is_cn):
+    news_list = []
+    if is_cn == '1':
+        news_list.extend(set(get_cn_news(keyword)))
+    if is_tw == '1':
+        news_list.extend(set(get_tw_news(keyword)))
+    if is_hk == '1':
+        news_list.extend(set(get_hk_news(keyword)))
+    return list(set(news_list))
+
 
 def remove_empty_sentence(sentences):
     return list(filter(lambda s: len(s.strip()), sentences))
@@ -107,14 +126,16 @@ def visualise_vectors(terms, vectors):
 @app.route('/api/base64')
 def get_vector_by_keyword():
     keyword = request.args.get("keyword")
+    is_tw = request.args.get("is_tw", 1)
+    is_hk = request.args.get("is_hk", 1)
+    is_cn = request.args.get("is_cn", 1)
     synonyms = get_synonyms_by_keyword(keyword)
 
     vectors = []
     for synonym in synonyms:
-        news_list = get_news_sentences(synonym)
+        news_list = get_news_sentences(synonym, is_tw, is_hk, is_cn)
         vector = fetch_vector_from_news(news_list, synonym)
         vectors.append(vector)
-
     return visualise_vectors(synonyms, vectors)
 
 
