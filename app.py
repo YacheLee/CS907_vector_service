@@ -65,11 +65,16 @@ def get_all_sentences(news_list, keyword):
         res.update(filter_list_without_term(sentences, keyword))
     return list(res)
 
+def get_single_vector(keyword):
+    return bc.encode([keyword])[0]
+
 def fetch_vector_from_news(news_list, keyword):
     if not news_list:
-        return bc.encode([keyword])[0]
+        return get_single_vector(keyword)
     else:
         sentences = get_all_sentences(news_list, keyword)
+        if not sentences:
+            return get_single_vector(keyword)
         vectors = bc.encode(sentences)
         return np.average(vectors, axis=0)
 
