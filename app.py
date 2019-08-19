@@ -8,11 +8,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from bert_serving.client import BertClient
 from flask import Flask, request
+from flask_cors import CORS
 from matplotlib.font_manager import FontProperties
 from sklearn.manifold import TSNE
 
 myfont = FontProperties(fname=r'C:\\Windows\\Fonts\\msjhbd.ttf')
 app = Flask(__name__)
+CORS(app)
 
 bc = BertClient()
 
@@ -39,12 +41,12 @@ def get_cn_news(keyword):
 
 def get_news_sentences(keyword, is_tw, is_hk, is_cn):
     news_list = []
-    if is_cn == '1':
-        news_list.extend(set(get_cn_news(keyword)))
-    if is_tw == '1':
+    if is_tw == 'true':
         news_list.extend(set(get_tw_news(keyword)))
-    if is_hk == '1':
+    if is_hk == 'true':
         news_list.extend(set(get_hk_news(keyword)))
+    if is_cn == 'true':
+        news_list.extend(set(get_cn_news(keyword)))
     return list(set(news_list))
 
 
@@ -126,9 +128,9 @@ def visualise_vectors(terms, vectors):
 @app.route('/api/base64')
 def get_vector_by_keyword():
     keyword = request.args.get("keyword")
-    is_tw = request.args.get("is_tw", 1)
-    is_hk = request.args.get("is_hk", 1)
-    is_cn = request.args.get("is_cn", 1)
+    is_tw = request.args.get("is_tw", "true")
+    is_hk = request.args.get("is_hk", "true")
+    is_cn = request.args.get("is_cn", "true")
     synonyms = get_synonyms_by_keyword(keyword)
 
     vectors = []
