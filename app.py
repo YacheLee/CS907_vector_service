@@ -27,8 +27,8 @@ def get_synonyms_by_keyword(keyword):
     url = "http://127.0.0.1:8079/api/synonym?keyword={}".format(quote(keyword))
     return http_request(url)
 
-def get_tw_news(keyword):
-    url = "http://127.0.0.1:8080/api/news?keyword={}".format(quote(keyword))
+def get_tw_news(keyword, is_tw_2016, is_tw_2017, is_tw_2018):
+    url = "http://127.0.0.1:8080/api/news?keyword={}&is_tw_2016={}&is_tw_2017={}&is_tw_2018={}".format(quote(keyword), is_tw_2016, is_tw_2017, is_tw_2018)
     return http_request(url)
 
 def get_hk_news(keyword):
@@ -39,10 +39,10 @@ def get_cn_news(keyword):
     url = "http://127.0.0.1:8077/api/news?keyword={}".format(quote(keyword))
     return http_request(url)
 
-def get_news_sentences(keyword, is_tw, is_hk, is_cn):
+def get_news_sentences(keyword, is_tw, is_hk, is_cn, is_tw_2016, is_tw_2017, is_tw_2018):
     news_list = []
     if is_tw == 'true':
-        news_list.extend(set(get_tw_news(keyword)))
+        news_list.extend(set(get_tw_news(keyword, is_tw_2016, is_tw_2017, is_tw_2018)))
     if is_hk == 'true':
         news_list.extend(set(get_hk_news(keyword)))
     if is_cn == 'true':
@@ -131,11 +131,14 @@ def get_vector_by_keyword():
     is_tw = request.args.get("is_tw", "true")
     is_hk = request.args.get("is_hk", "true")
     is_cn = request.args.get("is_cn", "true")
+    is_tw_2016 = request.args.get("is_tw_2016", "true")
+    is_tw_2017 = request.args.get("is_tw_2017", "true")
+    is_tw_2018 = request.args.get("is_tw_2018", "true")
     synonyms = get_synonyms_by_keyword(keyword)
 
     vectors = []
     for synonym in synonyms:
-        news_list = get_news_sentences(synonym, is_tw, is_hk, is_cn)
+        news_list = get_news_sentences(synonym, is_tw, is_hk, is_cn, is_tw_2016, is_tw_2017, is_tw_2018)
         vector = fetch_vector_from_news(news_list, synonym)
         vectors.append(vector)
     return visualise_vectors(synonyms, vectors)
