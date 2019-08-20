@@ -89,17 +89,17 @@ def get_all_sentences(news_list, keyword):
 def get_single_vector(keyword):
     return bc.encode([keyword])[0]
 
-def fetch_vector_from_news(news_list, keyword):
-    if not news_list:
+def fetch_vector_from_news(synonyms, keyword):
+    if not synonyms:
         return get_single_vector(keyword)
     else:
-        sentences = get_all_sentences(news_list, keyword)
+        sentences = get_all_sentences(synonyms, keyword)
         if not sentences:
             return get_single_vector(keyword)
         vectors = bc.encode(sentences)
         return np.average(vectors, axis=0)
 
-def visualise_vectors(terms, vectors):
+def generate_base64(terms, vectors):
     tsne_model = TSNE(perplexity=40, n_components=2, init='pca', n_iter=2500, random_state=23)
     new_values = tsne_model.fit_transform(vectors)
 
@@ -141,8 +141,7 @@ def get_vector_by_keyword():
         news_list = get_news_sentences(synonym, is_tw, is_hk, is_cn, is_tw_2016, is_tw_2017, is_tw_2018)
         vector = fetch_vector_from_news(news_list, synonym)
         vectors.append(vector)
-    return visualise_vectors(synonyms, vectors)
-
+    return generate_base64(synonyms, vectors)
 
 if __name__ == '__main__':
     app.run()
