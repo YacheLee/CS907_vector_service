@@ -6,11 +6,11 @@ from urllib.parse import quote
 
 import matplotlib.pyplot as plt
 import numpy as np
+import umap.umap_ as umap
 from bert_serving.client import BertClient
 from flask import Flask, request
 from flask_cors import CORS
 from matplotlib.font_manager import FontProperties
-from sklearn.manifold import TSNE
 
 myfont = FontProperties(fname=r'C:\\Windows\\Fonts\\msjhbd.ttf')
 app = Flask(__name__)
@@ -100,8 +100,7 @@ def fetch_vector_from_news(synonyms, keyword):
         return np.average(vectors, axis=0)
 
 def generate_base64(terms, vectors):
-    tsne_model = TSNE(perplexity=40, n_components=2, init='pca', n_iter=2500, random_state=23)
-    new_values = tsne_model.fit_transform(vectors)
+    new_values = umap.UMAP(n_neighbors=5, min_dist=0.3, metric='correlation').fit_transform(vectors)
 
     x = []
     y = []
